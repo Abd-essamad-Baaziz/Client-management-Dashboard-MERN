@@ -1,4 +1,3 @@
-//express framework for handling our APIs
 import express from 'express'
 // body-parser for parsing the Data coming in
 import bodyParser  from 'body-parser'
@@ -13,17 +12,16 @@ import helmet from 'helmet'
 // morgan for login our APIs Calls
 import morgan from 'morgan'
 // import To our Routes
-import clientRoutes from './routes/client.js'
-import generalRoutes from './routes/general.js'
-import managementRoutes from './routes/management.js'
-import salesRoutes from './routes/sales.js'
+import userRoutes from './routes/user.js'
+import fundManagementRoutes from './routes/funds.js'
+import processingLoanRoutes from './routes/loans.js'
+import ReserveBookRoutes from './routes/reservation.js'
 
-//data imports
-import User from './models/User.js'
-import { dataUser } from './data/index.js'
-import Product from './models/Product.js'
-import ProductStat from './models/ProductStat.js'
-import { dataProduct, dataProductStat } from './data/index.js'
+/* import Data */
+import User from './models/User.js';
+import Book from './models/Book.js'
+// import BookStat from './models/BookStat.js'
+import { dataUser, dataBook, dataBookStat } from './data/index.js'
 
 /* CONFIGURATION */
 dotenv.config() // so we can setup our envirement variables 
@@ -38,22 +36,24 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(cors())
 
 /** ROUTES */
-app.use('/client', clientRoutes)
-app.use('/general', generalRoutes)
-app.use('/management', managementRoutes)
-app.use('/sales', salesRoutes)
+app.use('/user', userRoutes)
+app.use('/funds', fundManagementRoutes)
+app.use('/loans', processingLoanRoutes)
+app.use('/reservation', ReserveBookRoutes)
+app.use('/book', bookRoutes)
 
-/** MONGOOSE SETUP */
-mongoose.set("strictQuery", true);
+/** DB CONNECTION */
+mongoose.set('strictQuery', false);
 const PORT = process.env.PORT || 9000
 mongoose.connect(process.env.MONGO_URL, {
     useNewUrlParser: true, 
     useUnifiedTopology: true
 }).then(() => {
-    app.listen(PORT, () => console.log(`server connected to the port ${PORT}`));
+    app.listen(PORT, () =>  console.log(`Listening on port ${PORT}`))
 
-    /* ONLY ADD DATA ONE TIME */
-    // User.insertMany(dataUser);
-    // Product.insertMany(dataProduct)
-    // ProductStat.insertMany(dataProductStat)
+        /* ONLY ADD DATA ONE TIME */
+        // User.insertMany(dataUser);
+        Book.insertMany(dataBook);
+        // BookStat.insertMany(dataBookStat);
+
 }).catch((err) => console.log(`${err} did not connect`))
